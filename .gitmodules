@@ -1,0 +1,12 @@
+[submodule "App"]
+	path = App
+	url = https://github.com/VibeCheck-Q/QSense-App.git
+	branch = main
+[submodule "Web"]
+	path = Web
+	url = https://github.com/VibeCheck-Q/QSense-Web.git
+	branch = main
+[submodule "Node"]
+	path = Node
+	url = https://github.com/VibeCheck-Q/QSense-Node.git
+	branch = main
