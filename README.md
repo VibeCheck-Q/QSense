@@ -10,6 +10,8 @@ This is the umbrella repo for the project. It ties together three devices workin
 
 ![Three devices, one closed loop](./public/banner.png)
 
+▶️ **[Watch the demo](https://www.youtube.com/shorts/cTYB6zcPg5c)**
+
 ## The three repos
 
 | Stage | Device | Repo | What it does |
