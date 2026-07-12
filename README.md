@@ -1,53 +1,95 @@
-# QSense Factory
+# QSense
 
-Privacy-first, distributed edge-AI predictive maintenance and safety system for MSME manufacturers — built for the Snapdragon Multiverse Hackathon.
+**Edge-AI predictive maintenance + worker safety for MSME factories**
 
-Legacy machinery can't afford cloud subscriptions or send proprietary process data off-site. QSense Factory runs entirely on-premises across three devices that form a **closed loop**, not a one-way pipeline:
+Team Vibe Check · Snapdragon Multiverse Hackathon, Bengaluru · July 11–12, 2026
 
-```
-Detect  ──►  Alert  ──►  Diagnose  ──►  Resolve
-  │                                        │
-  └────────────── baseline reset ◄─────────┘
-```
+A magnetically-attached retrofit kit that watches machines and workers, catches problems early, and walks a technician through the fix — entirely offline, on the factory floor. No cloud, no data leaves the floor.
 
-| Stage | Device | Submodule | What it does |
+This is the umbrella repo for the project. It ties together three devices working as one closed loop. Each device has its own repo with full setup and run instructions — this README covers the overall workflow and links out to them.
+
+![Three devices, one closed loop](./public/banner.png)
+
+## The three repos
+
+| Stage | Device | Repo | What it does |
 |---|---|---|---|
-| **Detect** | Arduino UNO Q | [`Node`](./Node) | Magnetically-attached sensor continuously monitors motor vibration offline and flags anomalies with a local TinyML model. |
-| **Alert** | Snapdragon Copilot+ PC | [`Web`](./Web) | Runs NPU-accelerated PPE (safety gear) compliance detection on a live camera feed, hosts the MQTT broker, logs events, and serves the admin dashboard. |
-| **Diagnose → Resolve** | Technician's mobile device | [`App`](./App) | Receives alerts and runs a local vision-language model to turn a photo of the machine into repair guidance. |
+| **Node** | Arduino UNO Q | [QSense-Node](https://github.com/VibeCheck-Q/QSense-Node) ([`./Node`](./Node)) | On-device vibration anomaly detection |
+| **Web** | Snapdragon Copilot+ PC | [QSense-Web](https://github.com/VibeCheck-Q/QSense-Web) ([`./Web`](./Web)) | MQTT hub, dashboard, alerting, PPE detection |
+| **App** | Snapdragon phone (OnePlus 15) | [QSense-App](https://github.com/VibeCheck-Q/QSense-App) ([`./App`](./App)) | On-device repair diagnosis assistant |
 
-When the technician resolves an issue on their phone, that signal flows back through the PC to clear the dashboard and reset the Arduino's vibration baseline — completing the cycle. No step in this loop requires an internet connection.
-
-## Repository layout
-
-This repo is a thin wrapper around three independent projects, each pinned as a git submodule tracking its own `main` branch:
-
-- **`App/`** — [QSense-App](https://github.com/VibeCheck-Q/QSense-App): Kotlin Multiplatform Android app (mobile diagnose/resolve client)
-- **`Node/`** — [QSense-Node](https://github.com/VibeCheck-Q/QSense-Node): Arduino UNO Q firmware + Python backend + dashboard (vibration detection)
-- **`Web/`** — [QSense-Web](https://github.com/VibeCheck-Q/QSense-Web): FastAPI hub + MQTT broker + React dashboard (PPE detection, alerting, orchestration)
-
-Each submodule has its own README with full setup and architecture details — start there once you know which piece you're working on.
+Full dependencies, build steps, and run commands live in each repo's own README — this doc only covers what each stage does and how they connect.
 
 ## Getting started
 
-Clone with submodules in one step:
-
 ```bash
 git clone --recurse-submodules git@github.com:VibeCheck-Q/QSense.git
-```
-
-If you've already cloned without that flag:
-
-```bash
+# already cloned without --recurse-submodules?
 git submodule update --init --recursive
 ```
 
-Pull in the latest commit from each submodule's tracked branch:
+## How it works — the closed loop
 
-```bash
-git submodule update --remote
 ```
+Detect (Node) ──► Manage (Web) ──► Repair (App)
+     ▲                                    │
+     └───────────────── Resolve ──────────┘
+```
+
+### 1. Detect — Arduino UNO Q ([QSense-Node](https://github.com/VibeCheck-Q/QSense-Node))
+
+- Continuous IMU vibration sampling
+- On-device TinyML anomaly detection, trained with Edge Impulse — Keras for classification, K-means for anomaly detection
+- Network architecture: 1 input layer, 2 dense hidden layers, 1 output layer
+- Model performance: **100% F1 score**, 1.7K peak RAM, 20.0K flash usage, 1 ms inference time
+- Deployed to the Arduino UNO Q via App Lab's `vibration_anomaly_detection` brick, plus a `web_ui` brick that shows per-device details
+- Publishes anomaly events to MQTT
+
+**Output:** machine ID, affected component, anomaly score, timestamp
+
+### 2. Manage — Snapdragon Copilot+ PC ([QSense-Web](https://github.com/VibeCheck-Q/QSense-Web))
+
+- MQTT broker receives anomaly events from all QSense Nodes
+- Stores machine history and event logs
+- Generates severity-based alerts
+- Runs NPU-accelerated PPE detection on the live camera feed
+- Displays a real-time factory dashboard
+- Automatically assigns the repair task to the appropriate technician
+- Publishes the assigned task to the technician's mobile device
+
+Acts as the central orchestration hub for the factory.
+
+### 3. Repair — Snapdragon phone ([QSense-App](https://github.com/VibeCheck-Q/QSense-App))
+
+- Technician receives the assigned task
+- Views machine and fault details
+- On-device LLM (RAG-grounded) generates ranked causes and fixes — no cloud round-trip, works even with poor network coverage
+- Technician marks the job resolved once fixed
+
+### 4. Resolve — the loop closes
+
+- Resolution is published back over MQTT
+- Dashboard alert clears
+- Node's baseline resets and monitoring resumes
+
+## Tech at a glance
+
+- **Node** — Edge Impulse (Keras + K-means), Arduino UNO Q, 100% F1 / 1.7K RAM / 20.0K flash / 1 ms inference
+- **Web** — Python, FastAPI, Mosquitto MQTT, NPU-accelerated YOLOv8m PPE detection, SQLite, React dashboard
+- **App** — Kotlin Multiplatform + Compose, on-device LLM (GenieX) with RAG grounding, MQTT client
 
 ## License
 
-Each submodule carries its own license — see the respective repo for details.
+MIT. See each module's repo for its own `LICENSE` file.
+
+## Team — Vibe Check
+
+| Name | Email |
+|---|---|
+| Salman Faris | farissalmannbr@gmail.com |
+| Shaan Shoukath | shaanshoukath4522@gmail.com |
+| Abdul Samad MJ | samadmj4@gmail.com |
+| Mohammed Nawf | m.nawf000@gmail.com |
+| Mohamed Jasim CM | jasimcherumeleth@gmail.com |
+
+![Team Vibe Check — live PPE-detection demo](./public/team-photo.png)
