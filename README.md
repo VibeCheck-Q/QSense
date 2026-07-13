@@ -16,9 +16,9 @@ This is the umbrella repo for the project. It ties together three devices workin
 
 | Stage | Device | Repo | What it does |
 |---|---|---|---|
-| **Node** | Arduino UNO Q | [QSense-Node](https://github.com/VibeCheck-Q/QSense-Node) ([`./Node`](./Node)) | On-device vibration anomaly detection |
-| **Web** | Snapdragon Copilot+ PC | [QSense-Web](https://github.com/VibeCheck-Q/QSense-Web) ([`./Web`](./Web)) | MQTT hub, dashboard, alerting, PPE detection |
-| **App** | Snapdragon phone (OnePlus 15) | [QSense-App](https://github.com/VibeCheck-Q/QSense-App) ([`./App`](./App)) | On-device repair diagnosis assistant |
+| **Node** | Arduino UNO Q | [QSense-Node](https://github.com/VibeCheck-Q/QSense-Node) | On-device vibration anomaly detection |
+| **Web** | Snapdragon Copilot+ PC | [QSense-Web](https://github.com/VibeCheck-Q/QSense-Web) | MQTT hub, dashboard, alerting, PPE detection |
+| **App** | Snapdragon phone (OnePlus 15) | [QSense-App](https://github.com/VibeCheck-Q/QSense-App) | On-device repair diagnosis assistant |
 
 Full dependencies, build steps, and run commands live in each repo's own README — this doc only covers what each stage does and how they connect.
 
@@ -86,12 +86,10 @@ MIT. See each module's repo for its own `LICENSE` file.
 
 ## Team — Vibe Check
 
-| Name | Email |
-|---|---|
-| Salman Faris | farissalmannbr@gmail.com |
-| Shaan Shoukath | shaanshoukath4522@gmail.com |
-| Abdul Samad MJ | samadmj4@gmail.com |
-| Mohammed Nawf | m.nawf000@gmail.com |
-| Mohamed Jasim CM | jasimcherumeleth@gmail.com |
+- Salman Faris
+- Shaan Shoukath
+- Abdul Samad MJ
+- Mohammed Nawf
+- Mohamed Jasim CM
 
 ![Team Vibe Check — live PPE-detection demo](./public/team-photo.png)
